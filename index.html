@@ -37,6 +37,24 @@
             opacity: 0.9;
         }
         
+        .admin-access {
+            margin-top: 1rem;
+        }
+        
+        .admin-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
         .container {
             max-width: 1200px;
             margin: 2rem auto;
@@ -160,6 +178,7 @@
             background: #000;
             border-radius: 5px;
             margin-bottom: 1.5rem;
+            position: relative;
         }
         
         .payment-section {
@@ -208,7 +227,7 @@
             font-weight: 500;
         }
         
-        .form-group input {
+        .form-group input, .form-group textarea {
             padding: 0.8rem;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -237,6 +256,7 @@
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 3rem;
+            display: none;
         }
         
         .upload-title {
@@ -298,6 +318,43 @@
             margin-top: 3rem;
         }
         
+        .admin-panel {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+        
+        .admin-panel h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .admin-action-btn {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        
+        .admin-action-btn:hover {
+            background: #5a0db3;
+        }
+        
         @media (max-width: 768px) {
             .video-grid {
                 grid-template-columns: 1fr;
@@ -306,6 +363,10 @@
             .video-player {
                 height: 250px;
             }
+            
+            .admin-actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -313,30 +374,42 @@
     <header>
         <div class="logo">Mauli Krupa Graphics</div>
         <div class="tagline">Premium Video Content for Your Projects</div>
+        <div class="admin-access">
+            <button class="admin-btn" id="adminBtn">Admin Access</button>
+        </div>
     </header>
     
     <div class="container">
-        <div class="upload-section">
-            <h2 class="upload-title">Upload New Video</h2>
-            <form class="upload-form" id="uploadForm">
-                <div class="form-group">
-                    <label for="videoTitle">Video Title</label>
-                    <input type="text" id="videoTitle" required>
-                </div>
-                <div class="form-group">
-                    <label for="videoDescription">Description</label>
-                    <input type="text" id="videoDescription" required>
-                </div>
-                <div class="form-group">
-                    <label for="videoPrice">Price (₹)</label>
-                    <input type="number" id="videoPrice" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="videoFile">Video File</label>
-                    <input type="file" id="videoFile" accept="video/*" required>
-                </div>
-                <button type="submit" class="upload-btn">Upload Video</button>
-            </form>
+        <!-- Admin Panel - Only visible when admin is logged in -->
+        <div class="admin-panel" id="adminPanel">
+            <h2>Admin Panel</h2>
+            <div class="admin-actions">
+                <button class="admin-action-btn" id="toggleUploadBtn">Show Upload Section</button>
+                <button class="admin-action-btn" id="logoutBtn">Logout</button>
+            </div>
+            
+            <div class="upload-section" id="uploadSection">
+                <h2 class="upload-title">Upload New Video</h2>
+                <form class="upload-form" id="uploadForm">
+                    <div class="form-group">
+                        <label for="videoTitle">Video Title</label>
+                        <input type="text" id="videoTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="videoDescription">Description</label>
+                        <textarea id="videoDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="videoPrice">Price (₹)</label>
+                        <input type="number" id="videoPrice" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="videoFile">Video File</label>
+                        <input type="file" id="videoFile" accept="video/*" required>
+                    </div>
+                    <button type="submit" class="upload-btn">Upload Video</button>
+                </form>
+            </div>
         </div>
         
         <h2 style="margin-bottom: 1.5rem; text-align: center;">Available Videos</h2>
@@ -426,19 +499,35 @@
         const paymentAmount = document.getElementById('paymentAmount');
         const upiQrCode = document.getElementById('upiQrCode');
         const uploadForm = document.getElementById('uploadForm');
+        const adminBtn = document.getElementById('adminBtn');
+        const adminPanel = document.getElementById('adminPanel');
+        const toggleUploadBtn = document.getElementById('toggleUploadBtn');
+        const uploadSection = document.getElementById('uploadSection');
+        const logoutBtn = document.getElementById('logoutBtn');
         
         // Current video being viewed
         let currentVideo = null;
+        let isAdminLoggedIn = false;
         
         // Initialize the page
         function init() {
             renderVideos();
             setupEventListeners();
+            
+            // Check if admin is already logged in (from previous session)
+            if (localStorage.getItem('adminLoggedIn') === 'true') {
+                adminLogin();
+            }
         }
         
         // Render videos to the grid
         function renderVideos() {
             videoGrid.innerHTML = '';
+            
+            if (videos.length === 0) {
+                videoGrid.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">No videos available yet. Check back soon!</p>';
+                return;
+            }
             
             videos.forEach(video => {
                 const videoCard = document.createElement('div');
@@ -490,6 +579,36 @@
             uploadForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 uploadVideo();
+            });
+            
+            // Admin button
+            adminBtn.addEventListener('click', () => {
+                if (isAdminLoggedIn) {
+                    adminLogout();
+                } else {
+                    const password = prompt('Enter admin password:');
+                    if (password === 'admin123') { // You can change this password
+                        adminLogin();
+                    } else if (password) {
+                        alert('Incorrect password!');
+                    }
+                }
+            });
+            
+            // Toggle upload section
+            toggleUploadBtn.addEventListener('click', () => {
+                if (uploadSection.style.display === 'block') {
+                    uploadSection.style.display = 'none';
+                    toggleUploadBtn.textContent = 'Show Upload Section';
+                } else {
+                    uploadSection.style.display = 'block';
+                    toggleUploadBtn.textContent = 'Hide Upload Section';
+                }
+            });
+            
+            // Logout button
+            logoutBtn.addEventListener('click', () => {
+                adminLogout();
             });
             
             // Video time update to limit preview
@@ -583,7 +702,7 @@
             // In a real application, you would upload the file to a server
             // For this demo, we'll create a mock video object
             const newVideo = {
-                id: videos.length + 1,
+                id: videos.length > 0 ? Math.max(...videos.map(v => v.id)) + 1 : 1,
                 title,
                 description,
                 price,
@@ -597,7 +716,24 @@
             // Reset form
             uploadForm.reset();
             
-            alert('Video uploaded successfully!');
+            alert('Video uploaded successfully! It is now visible in the video gallery.');
+        }
+        
+        // Admin login
+        function adminLogin() {
+            isAdminLoggedIn = true;
+            adminPanel.style.display = 'block';
+            adminBtn.textContent = 'Admin Mode';
+            localStorage.setItem('adminLoggedIn', 'true');
+        }
+        
+        // Admin logout
+        function adminLogout() {
+            isAdminLoggedIn = false;
+            adminPanel.style.display = 'none';
+            uploadSection.style.display = 'none';
+            adminBtn.textContent = 'Admin Access';
+            localStorage.setItem('adminLoggedIn', 'false');
         }
         
         // Initialize the application
