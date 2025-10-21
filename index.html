@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mauli Krupa Graphics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-info {
+            padding: 1.5rem;
+        }
+        
+        .video-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .video-description {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .video-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2575fc;
+            margin-bottom: 1rem;
+        }
+        
+        .preview-btn, .unlock-btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: #6a11cb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .preview-btn {
+            background: #2575fc;
+        }
+        
+        .preview-btn:hover, .unlock-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .video-player {
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-section {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+        
+        .payment-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .upi-qr {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .upi-qr img {
+            max-width: 200px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: white;
+        }
+        
+        .upi-details {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .submit-payment {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        
+        .submit-payment:hover {
+            background: #5a0db3;
+        }
+        
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+        
+        .upload-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+            text-align: center;
+        }
+        
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .upload-btn {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            background: #5a0db3;
+        }
+        
+        .blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .unlock-text {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-player {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Mauli Krupa Graphics</div>
+        <div class="tagline">Premium Video Content for Your Projects</div>
+    </header>
+    
+    <div class="container">
+        <div class="upload-section">
+            <h2 class="upload-title">Upload New Video</h2>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label for="videoTitle">Video Title</label>
+                    <input type="text" id="videoTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="videoDescription">Description</label>
+                    <input type="text" id="videoDescription" required>
+                </div>
+                <div class="form-group">
+                    <label for="videoPrice">Price (₹)</label>
+                    <input type="number" id="videoPrice" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="videoFile">Video File</label>
+                    <input type="file" id="videoFile" accept="video/*" required>
+                </div>
+                <button type="submit" class="upload-btn">Upload Video</button>
+            </form>
+        </div>
+        
+        <h2 style="margin-bottom: 1.5rem; text-align: center;">Available Videos</h2>
+        <div class="video-grid" id="videoGrid">
+            <!-- Video cards will be dynamically added here -->
+        </div>
+    </div>
+    
+    <!-- Video Preview/Payment Modal -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <div class="video-player" id="videoPlayer">
+                <div class="blur-overlay" id="blurOverlay">
+                    <div class="unlock-text">Unlock Full Video</div>
+                    <p>Pay ₹<span id="modalPrice">0</span> to access the complete video</p>
+                </div>
+                <video id="videoElement" controls style="width: 100%; height: 100%;">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            
+            <div class="payment-section" id="paymentSection">
+                <h3 class="payment-title">Pay with UPI</h3>
+                <div class="upi-qr">
+                    <img id="upiQrCode" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7588384982@fam&pn=Mauli%20Krupa%20Graphics&am=100&cu=INR" alt="UPI QR Code">
+                </div>
+                <div class="upi-details">
+                    <p>UPI ID: <strong>7588384982@fam</strong></p>
+                    <p>Amount: ₹<span id="paymentAmount">100</span></p>
+                </div>
+                
+                <form class="payment-form" id="paymentForm">
+                    <div class="form-group">
+                        <label for="transactionId">Transaction ID</label>
+                        <input type="text" id="transactionId" placeholder="Enter UPI Transaction ID" required>
+                    </div>
+                    <button type="submit" class="submit-payment">Verify Payment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2023 Mauli Krupa Graphics. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        // Sample videos data
+        let videos = [
+            {
+                id: 1,
+                title: "Logo Animation Tutorial",
+                description: "Learn how to create professional logo animations in After Effects",
+                price: 150,
+                videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+                thumbnail: "https://picsum.photos/400/200?random=1"
+            },
+            {
+                id: 2,
+                title: "Motion Graphics Basics",
+                description: "Fundamentals of motion graphics for beginners",
+                price: 200,
+                videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+                thumbnail: "https://picsum.photos/400/200?random=2"
+            },
+            {
+                id: 3,
+                title: "Advanced 3D Animation",
+                description: "Create stunning 3D animations with this comprehensive guide",
+                price: 300,
+                videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+                thumbnail: "https://picsum.photos/400/200?random=3"
+            }
+        ];
+        
+        // DOM Elements
+        const videoGrid = document.getElementById('videoGrid');
+        const videoModal = document.getElementById('videoModal');
+        const closeModal = document.getElementById('closeModal');
+        const videoElement = document.getElementById('videoElement');
+        const blurOverlay = document.getElementById('blurOverlay');
+        const paymentSection = document.getElementById('paymentSection');
+        const paymentForm = document.getElementById('paymentForm');
+        const transactionIdInput = document.getElementById('transactionId');
+        const modalPrice = document.getElementById('modalPrice');
+        const paymentAmount = document.getElementById('paymentAmount');
+        const upiQrCode = document.getElementById('upiQrCode');
+        const uploadForm = document.getElementById('uploadForm');
+        
+        // Current video being viewed
+        let currentVideo = null;
+        
+        // Initialize the page
+        function init() {
+            renderVideos();
+            setupEventListeners();
+        }
+        
+        // Render videos to the grid
+        function renderVideos() {
+            videoGrid.innerHTML = '';
+            
+            videos.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.innerHTML = `
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail}" alt="${video.title}">
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">${video.title}</h3>
+                        <p class="video-description">${video.description}</p>
+                        <div class="video-price">₹${video.price}</div>
+                        <button class="preview-btn" data-id="${video.id}">Preview Video</button>
+                        <button class="unlock-btn" data-id="${video.id}">Unlock Full Video</button>
+                    </div>
+                `;
+                videoGrid.appendChild(videoCard);
+            });
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                videoModal.style.display = 'none';
+                videoElement.pause();
+            });
+            
+            // Preview video button
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('preview-btn')) {
+                    const videoId = parseInt(e.target.getAttribute('data-id'));
+                    openVideoModal(videoId, true);
+                }
+                
+                if (e.target.classList.contains('unlock-btn')) {
+                    const videoId = parseInt(e.target.getAttribute('data-id'));
+                    openVideoModal(videoId, false);
+                }
+            });
+            
+            // Payment form submission
+            paymentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                verifyPayment();
+            });
+            
+            // Upload form submission
+            uploadForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                uploadVideo();
+            });
+            
+            // Video time update to limit preview
+            videoElement.addEventListener('timeupdate', () => {
+                if (currentVideo && currentVideo.previewMode && videoElement.currentTime >= 15) {
+                    videoElement.pause();
+                    blurOverlay.style.display = 'flex';
+                }
+            });
+        }
+        
+        // Open video modal
+        function openVideoModal(videoId, previewMode) {
+            currentVideo = videos.find(v => v.id === videoId);
+            if (!currentVideo) return;
+            
+            currentVideo.previewMode = previewMode;
+            
+            // Set video source
+            videoElement.src = currentVideo.videoUrl;
+            
+            // Update modal content
+            modalPrice.textContent = currentVideo.price;
+            paymentAmount.textContent = currentVideo.price;
+            
+            // Update UPI QR code with correct amount
+            upiQrCode.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=7588384982@fam&pn=Mauli%20Krupa%20Graphics&am=${currentVideo.price}&cu=INR`;
+            
+            // Show/hide blur overlay based on preview mode
+            if (previewMode) {
+                blurOverlay.style.display = 'flex';
+                videoElement.currentTime = 0;
+                videoElement.addEventListener('loadedmetadata', () => {
+                    // Limit to 15 seconds for preview
+                    if (videoElement.duration > 15) {
+                        videoElement.currentTime = 0;
+                    }
+                });
+            } else {
+                blurOverlay.style.display = 'none';
+            }
+            
+            // Show modal
+            videoModal.style.display = 'flex';
+        }
+        
+        // Verify payment
+        function verifyPayment() {
+            const transactionId = transactionIdInput.value.trim();
+            
+            if (!transactionId) {
+                alert('Please enter a transaction ID');
+                return;
+            }
+            
+            // In a real application, you would verify the transaction with your payment provider
+            // For this demo, we'll simulate verification
+            setTimeout(() => {
+                // Simulate successful payment verification
+                alert('Payment verified successfully! You now have full access to this video.');
+                blurOverlay.style.display = 'none';
+                currentVideo.previewMode = false;
+                
+                // Enable download
+                const downloadLink = document.createElement('a');
+                downloadLink.href = currentVideo.videoUrl;
+                downloadLink.download = `${currentVideo.title}.mp4`;
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                // Close modal
+                videoModal.style.display = 'none';
+                transactionIdInput.value = '';
+            }, 1500);
+        }
+        
+        // Upload new video
+        function uploadVideo() {
+            const title = document.getElementById('videoTitle').value;
+            const description = document.getElementById('videoDescription').value;
+            const price = parseInt(document.getElementById('videoPrice').value);
+            const fileInput = document.getElementById('videoFile');
+            
+            if (!title || !description || !price || !fileInput.files.length) {
+                alert('Please fill all fields and select a video file');
+                return;
+            }
+            
+            // In a real application, you would upload the file to a server
+            // For this demo, we'll create a mock video object
+            const newVideo = {
+                id: videos.length + 1,
+                title,
+                description,
+                price,
+                videoUrl: URL.createObjectURL(fileInput.files[0]),
+                thumbnail: "https://picsum.photos/400/200?random=" + (videos.length + 1)
+            };
+            
+            videos.push(newVideo);
+            renderVideos();
+            
+            // Reset form
+            uploadForm.reset();
+            
+            alert('Video uploaded successfully!');
+        }
+        
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
